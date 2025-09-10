@@ -1,71 +1,42 @@
-"use client"
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabaseClient"
-import PostComments from "@/components/PostComments"
+import Link from 'next/link'
 
-export default function HomePage() {
-  const [posts, setPosts] = useState([])
-
-  useEffect(() => {
-    fetchPosts()
-  }, [])
-
-  async function fetchPosts() {
-    const { data } = await supabase
-      .from("posts")
-      .select(`
-        *,
-        profiles(username, avatar_url)
-      `)
-      .order("created_at", { ascending: false })
-    setPosts(data || [])
-  }
-
-  async function handleLike(postId) {
-    // زيادة التقييم أو الإعجاب
-    const { data } = await supabase
-      .from("posts")
-      .select("likes")
-      .eq("id", postId)
-      .single()
-
-    await supabase
-      .from("posts")
-      .update({ likes: (data.likes || 0) + 1 })
-      .eq("id", postId)
-
-    fetchPosts()
-  }
-
+export default function Home() {
   return (
-    <div className="max-w-5xl mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">آخر المنشورات</h1>
+    <div style={{ fontFamily: 'Arial, sans-serif' }}>
+      {/* Navbar */}
+      <nav style={{ padding: '1rem', borderBottom: '1px solid #ccc', marginBottom: '2rem' }}>
+        <Link href="/" style={{ marginRight: '1rem' }}>الرئيسية</Link>
+        <Link href="/login" style={{ marginRight: '1rem' }}>دخول</Link>
+        <Link href="/signup" style={{ marginRight: '1rem' }}>تسجيل</Link>
+        <Link href="/profile/1" style={{ marginRight: '1rem' }}>الملف الشخصي</Link>
+        <Link href="/plans" style={{ marginRight: '1rem' }}>الباقات</Link>
+        <Link href="/admin" style={{ marginRight: '1rem' }}>لوحة الإدارة</Link>
+      </nav>
 
-      {posts.length === 0 ? (
-        <p className="text-gray-500">لا توجد منشورات بعد.</p>
-      ) : (
-        posts.map(post => (
-          <div key={post.id} className="border rounded shadow p-4 mb-6">
-            <div className="flex items-center gap-3 mb-2">
-              <img src={post.profiles.avatar_url} alt={post.profiles.username} className="w-10 h-10 rounded-full" />
-              <span className="font-semibold">{post.profiles.username}</span>
-              <span className="text-gray-500 text-sm">• {new Date(post.created_at).toLocaleDateString("ar-SA")}</span>
-            </div>
+      {/* محتوى الصفحة */}
+      <main style={{ padding: '0 2rem' }}>
+        <h1>الصفحة الرئيسية</h1>
+        <p>هنا سيتم عرض آخر المنشورات. هذه نسخة تجريبية قبل الربط الفعلي بالبيانات.</p>
 
-            <img src={post.image_url} alt={post.title} className="w-full h-48 object-cover rounded mb-2" />
-            <h2 className="font-bold text-lg">{post.title}</h2>
-            <p className="mb-2">{post.description}</p>
-
-            <div className="flex gap-3 items-center">
-              <button onClick={() => handleLike(post.id)} className="bg-yellow-400 px-3 py-1 rounded">
-                👍 إعجاب ({post.likes || 0})
-              </button>
-            </div>
-
-            <PostComments postId={post.id} />
+        {/* أمثلة منشورات */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginTop: '2rem' }}>
+          <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem' }}>
+            <h2>منشور تجريبي 1</h2>
+            <p>وصف مختصر للمنشور...</p>
+            <p>السعر: 100</p>
           </div>
-        ))
-      )}
+          <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem' }}>
+            <h2>منشور تجريبي 2</h2>
+            <p>وصف مختصر للمنشور...</p>
+            <p>السعر: 250</p>
+          </div>
+          <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem' }}>
+            <h2>منشور تجريبي 3</h2>
+            <p>وصف مختصر للمنشور...</p>
+            <p>السعر: 400</p>
+          </div>
+        </div>
+      </main>
     </div>
   )
 }
